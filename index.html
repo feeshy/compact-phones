@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>小屏手机数据库</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <meta name="theme-color" content="#3b82f6">
+</head>
+
+<body>
+  <div class="header">
+    <div class="links">
+      <a href="https://feeshy.github.io">home</a>&gt;
+      <a href="https://feeshy.github.io/lists">lists</a>&gt;
+
+    </div>
+    <div class="title-section">
+      <h1>小屏手机数据库</h1>
+      <time class="date-badge" id="updateDateBadge" datetime="2026-05-18">更新日期：2026-05-18</time>
+    </div>
+  </div>
+
+  <!-- 六个筛选项网格 -->
+  <div class="filters-grid">
+    <div class="filter-grid">
+      <div class="filter-item">
+        <label>发布年份</label>
+        <div class="year-range">
+          <input type="number" id="yearFrom" placeholder="起始" class="year-num">
+          <span>-</span>
+          <input type="number" id="yearTo" placeholder="结束" class="year-num">
+        </div>
+      </div>
+      <div class="filter-item">
+        <label>类型</label>
+        <div class="type-switch-group" id="typeSwitchGroup">
+          <button data-type="all" class="type-option">全部</button>
+          <button data-type="直板" class="type-option">直板</button>
+          <button data-type="折叠" class="type-option">折叠</button>
+        </div>
+      </div>
+      <div class="filter-item">
+        <label>宽度</label>
+        <div class="num-input"><input type="number" id="widthMax" step="0.1" placeholder=""><span>mm</span></div>
+      </div>
+      <div class="filter-item">
+        <label>厚度</label>
+        <div class="num-input">≤<input type="number" id="thickMax" step="0.1" placeholder=""><span>mm</span></div>
+      </div>
+      <div class="filter-item">
+        <label>重量</label>
+        <div class="num-input">≤<input type="number" id="weightMax" step="1" placeholder=""><span>g</span></div>
+      </div>
+      <div class="filter-item">
+        <label>电池</label>
+        <div class="num-input">≤<input type="number" id="batteryMin" step="50" placeholder=""><span>mAh</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 工具栏 -->
+  <div class="action-bar">
+    <div class="sort-group">
+      <span>排序依据</span>
+      <select id="sortField">
+        <option value="model">型号</option>
+        <option value="brand">品牌</option>
+        <option value="screenRatio">屏幕比例</option>
+        <option value="screenSize">屏幕尺寸</option>
+        <option value="width">宽度</option>
+        <option value="thickness">厚度</option>
+        <option value="weight">重量</option>
+        <option value="battery">电池</option>
+        <option value="year">年份</option>
+        <option value="type">类型</option>
+        <option value="soc">SoC</option>
+      </select>
+      <button id="sortOrderBtn">升序</button>
+    </div>
+    <button class="reset-btn" id="resetFilters">重置筛选</button>
+  </div>
+
+  <!-- 表格区域 -->
+  <div class="table-wrapper">
+    <table class="phone-table" id="phoneTable">
+      <thead>
+        <tr>
+          <th data-field="model">型号</th>
+          <th data-field="brand">品牌</th>
+          <th data-field="screenRatio">屏幕比例</th>
+          <th data-field="screenSize">屏幕尺寸(吋)</th>
+          <th data-field="width">宽度(mm)</th>
+          <th data-field="thickness">厚度(mm)</th>
+          <th data-field="weight">重量(g)</th>
+          <th data-field="battery">电池(mAh)</th>
+          <th data-field="year">发布年份</th>
+          <th data-field="soc">SoC</th>
+          <th data-field="type">类型</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody">
+        <tr>
+          <td colspan="11" class="loading">加载数据中...</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 卡片容器 -->
+  <div class="cards-view" id="cardsContainer"></div>
+  <footer>
+    <div class="standard-box">
+      <p class="stats" id="statsInfo">加载中...</p>
+      <p>收录标准 ｜ 直板机 宽≤72mm 重≤200g ｜ 折叠机 宽≤80mm 重≤220g</p>
+      <p><a href="https://1drv.ms/x/s!As8fb6-4t65KiqEReU3ZnjF2JWmGsw" target="_blank">Excel版</a> | <a href="https://t.me/compact_phones" target="_blank">交流群</a> | <a href="https://github.com/feeshy/compact-phones" target="_blank">源码&提名</a></p>
+
+    </div>
+  </footer>
+  </div>
+
+  <script src="script.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js').then(reg => {
+        console.log('Service Worker registered', reg);
+      }).catch(err => console.log('SW registration failed', err));
+    }
+  </script>
+</body>
+
+</html>
