@@ -1,0 +1,29 @@
+{
+  "name": "小屏手机数据库",
+  "short_name": "小屏手机",
+  "description": "小尺寸手机筛选与排序工具，支持离线使用",
+  "start_url": "https://feeshy.github.io/compact-phones",
+  "display": "standalone",
+  "theme_color": "#6c7a8e",
+  "background_color": "#f5f5f5",
+  "icons": [
+    {
+      "src": "favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "maskable.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    },
+    {
+      "src": "apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
