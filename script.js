@@ -48,11 +48,15 @@ async function loadCSVAndMetadata() {
     const response = await fetch('data.csv', { cache: 'no-store' });
     if (!response.ok) throw new Error('无法加载 data.csv');
     const lastModified = response.headers.get('Last-Modified');
+    const badge = document.getElementById('updateDateBadge');
     if (lastModified) {
       const date = new Date(lastModified);
-      document.getElementById('updateDateBadge').innerText = `更新：${date.toLocaleDateString()}`;
+      const formatted = date.toLocaleDateString();
+      badge.textContent = `数据：${formatted}`;
+      badge.setAttribute('datetime', date.toISOString().split('T')[0]);
     } else {
-      document.getElementById('updateDateBadge').innerText = `更新：2026-05-17 (静态)`;
+      badge.textContent = `数据：2026-05-17`;
+      badge.setAttribute('datetime', '2026-05-17');
     }
     const csvText = await response.text();
     parseCSV(csvText);
