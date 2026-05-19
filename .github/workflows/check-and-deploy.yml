@@ -1,6 +1,8 @@
 name: Check and Deploy Google Sheet Data
 
 on:
+  push:
+    branches: [ main ]
   schedule:
     - cron: '0 0 * * *'
   workflow_dispatch:
@@ -84,20 +86,31 @@ jobs:
           fi
           echo "prev_time=$PREV" >> $GITHUB_OUTPUT
 
-      - name: Compare and update if changed
+      - name: Decide whether to deploy and fetch data
         id: update
         run: |
+          FORCE_DEPLOY=false
+          if [[ "${{ github.event_name }}" == "push" ]] || [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            FORCE_DEPLOY=true
+            echo "Force deploy mode: ON (triggered by ${{ github.event_name }})"
+          else
+            echo "Force deploy mode: OFF (triggered by schedule)"
+          fi
+
           CURRENT="${{ steps.get_time.outputs.modified_time }}"
           PREV="${{ steps.read_prev.outputs.prev_time }}"
-          if [ "$CURRENT" = "$PREV" ]; then
-            echo "No change, exiting."
+
+          if [ "$FORCE_DEPLOY" = true ] || [ "$CURRENT" != "$PREV" ]; then
+            echo "changed=true" >> $GITHUB_OUTPUT
+            echo "$CURRENT" > date.txt
+            CSV_URL="https://docs.google.com/spreadsheets/d/e/2PACX-1vTxyzFWZtixYEqZMLHM_hwnSeSmFjIxIm27YWVMIMZjbfkbsfG6aPLR1fqAFuiyyW6K8znFPuAqVrOj/pub?gid=134994152&single=true&output=csv"
+            curl -L "$CSV_URL" -o data.csv
+            echo "Deployment will proceed."
+          else
             echo "changed=false" >> $GITHUB_OUTPUT
+            echo "No change, exiting."
             exit 0
           fi
-          echo "changed=true" >> $GITHUB_OUTPUT
-          echo "$CURRENT" > date.txt
-          CSV_URL="https://docs.google.com/spreadsheets/d/e/2PACX-1vTxyzFWZtixYEqZMLHM_hwnSeSmFjIxIm27YWVMIMZjbfkbsfG6aPLR1fqAFuiyyW6K8znFPuAqVrOj/pub?gid=134994152&single=true&output=csv"
-          curl -L "$CSV_URL" -o data.csv
 
       - name: Prepare deployment folder with injected date
         if: steps.update.outputs.changed == 'true'
@@ -108,6 +121,7 @@ jobs:
 
           cp -r main_repo/* deploy/ 2>/dev/null || true
           cp -r main_repo/.[!.]* deploy/ 2>/dev/null || true
+
           cd deploy
           rm -f LICENSE README.md readme.md 2>/dev/null || true
           cd ..
@@ -117,6 +131,8 @@ jobs:
           sed -i "s/{{UPDATE_DATE_ISO}}/${DATE_VALUE}/g" deploy/index.html
 
           touch deploy/.nojekyll
+          echo "Deploy directory contents:"
+          ls -la deploy/
 
       - name: Save date to cache for next run
         if: steps.update.outputs.changed == 'true'
