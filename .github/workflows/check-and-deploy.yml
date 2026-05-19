@@ -33,7 +33,7 @@ jobs:
         uses: google-github-actions/auth@v2
         with:
           credentials_json: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
-          access_token_scopes: 'https://www.googleapis.com/auth/drive.readonly'
+          access_token_scopes: 'https://www.googleapis.com/auth/drive'
 
       - name: Get Drive file modified time
         id: get_time
@@ -49,7 +49,7 @@ jobs:
 
           RESPONSE=$(curl -s -w "\n%{http_code}" -H "Authorization: Bearer $ACCESS_TOKEN" \
             "https://www.googleapis.com/drive/v3/files/${FILE_ID}?fields=modifiedTime")
-          
+
           HTTP_STATUS=$(echo "$RESPONSE" | tail -n1)
           BODY=$(echo "$RESPONSE" | head -n -1)
           
