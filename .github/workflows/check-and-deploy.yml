@@ -33,7 +33,6 @@ jobs:
         uses: google-github-actions/auth@v2
         with:
           credentials_json: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
-          # 下面的作用域不再被 gcloud 使用，但保留无妨
           access_token_scopes: 'https://www.googleapis.com/auth/drive.readonly'
           create_credentials_file: true
 
@@ -42,9 +41,7 @@ jobs:
         env:
           FILE_ID: '1w9EJ0s4-YbMlEi3NOhVKp-rn3PTQ66kgq4Sodgf7oms'
         run: |
-          # 安装 Python 依赖
           pip install --quiet google-auth google-api-python-client
-
           python << EOF
           import os
           from google.oauth2 import service_account
@@ -121,8 +118,9 @@ jobs:
           done
           cd ..
           cp data.csv deploy/
-          sed -i "s/{{UPDATE_DATE_DISPLAY}}/${DISPLAY_DATE}/g" deploy/index.html
-          sed -i "s/{{UPDATE_DATE_ISO}}/${ISO_DATE}/g" deploy/index.html
+          # 使用 | 作为 sed 分隔符，避免日期中的 / 引起冲突
+          sed -i "s|{{UPDATE_DATE_DISPLAY}}|${DISPLAY_DATE}|g" deploy/index.html
+          sed -i "s|{{UPDATE_DATE_ISO}}|${ISO_DATE}|g" deploy/index.html
 
       - name: Save date to cache for next run
         if: steps.update.outputs.changed == 'true'
