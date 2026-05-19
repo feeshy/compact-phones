@@ -43,21 +43,10 @@ function getYearRange() {
   return { from, to };
 }
 
-async function loadCSVAndMetadata() {
+async function loadCSVData() {
   try {
     const response = await fetch('data.csv', { cache: 'no-store' });
     if (!response.ok) throw new Error('无法加载 data.csv');
-    const lastModified = response.headers.get('Last-Modified');
-    const badge = document.getElementById('updateDateBadge');
-    if (lastModified) {
-      const date = new Date(lastModified);
-      const formatted = date.toLocaleDateString();
-      badge.textContent = `数据：${formatted}`;
-      badge.setAttribute('datetime', date.toISOString().split('T')[0]);
-    } else {
-      badge.textContent = `数据：2026-05-17`;
-      badge.setAttribute('datetime', '2026-05-17');
-    }
     const csvText = await response.text();
     parseCSV(csvText);
   } catch (error) {
@@ -71,17 +60,21 @@ function parseCSV(csv) {
   const lines = csv.trim().split(/\r?\n/);
   if (lines.length < 2) return;
   const headers = lines[0].split(',').map(h => h.trim());
-  const idxModel = headers.indexOf('型号');
-  const idxBrand = headers.indexOf('品牌');
-  const idxRatio = headers.indexOf('屏幕比例');
-  const idxSize = headers.indexOf('屏幕尺寸');
-  const idxWidth = headers.indexOf('宽度');
-  const idxThick = headers.indexOf('厚度');
-  const idxWeight = headers.indexOf('重量');
-  const idxBattery = headers.indexOf('电池');
-  const idxYear = headers.indexOf('发布年份');
-  const idxSoc = headers.indexOf('SoC');
-  const idxType = headers.indexOf('类型');
+
+  // 动态查找列索引
+  const idxModel = headers.findIndex(h => h.includes('机型'));
+  const idxBrand = headers.findIndex(h => h.includes('品牌'));
+  const idxRatio = headers.findIndex(h => h.includes('比例'));
+  const idxSize = headers.findIndex(h => h.includes('尺寸'));
+  const idxWidth = headers.findIndex(h => h.includes('宽度'));
+  const idxThick = headers.findIndex(h => h.includes('厚度'));
+  const idxWeight = headers.findIndex(h => h.includes('重量'));
+  const idxBattery = headers.findIndex(h => h.includes('电池'));
+  const idxSoc = headers.findIndex(h => h.toLowerCase().includes('soc'));
+  const idxYear = headers.findIndex(h => h.includes('年份'));
+  const idxType = headers.findIndex(h => h.includes('类型'));
+  const idxUrl = headers.findIndex(h => h.includes('官网'));
+  const idxRemark = headers.findIndex(h => h.includes('备注'));
 
   const data = [];
   for (let i = 1; i < lines.length; i++) {
@@ -98,6 +91,8 @@ function parseCSV(csv) {
     let year = parseInt(row[idxYear]?.trim());
     const soc = row[idxSoc]?.trim() || '';
     const type = row[idxType]?.trim() || '';
+    const url = row[idxUrl]?.trim() || '';
+    const remark = row[idxRemark]?.trim() || '';
 
     if (isNaN(screenSize)) screenSize = null;
     if (isNaN(width)) width = null;
@@ -106,7 +101,7 @@ function parseCSV(csv) {
     if (isNaN(battery)) battery = null;
     if (isNaN(year)) year = null;
 
-    data.push({ model, brand, screenRatio, screenSize, width, thickness, weight, battery, year, soc, type });
+    data.push({ model, brand, screenRatio, screenSize, width, thickness, weight, battery, year, soc, type, url, remark });
   }
   phonesData = data;
   initYearRange();
@@ -177,6 +172,7 @@ function getSortValue(item, field) {
     case 'year': return item.year ?? -1;
     case 'type': return item.type;
     case 'soc': return item.soc;
+    case 'remark': return item.remark;
     default: return item.model;
   }
 }
@@ -208,7 +204,15 @@ function escapeHtml(str) {
   });
 }
 
-// 修复表格渲染：确保没有多余的文本节点
+// 辅助：生成带链接的机型 HTML
+function formatModelLink(model, url) {
+  const escapedModel = escapeHtml(model);
+  if (url && url.trim() !== '') {
+    return `<a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">${escapedModel}</a>`;
+  }
+  return escapedModel;
+}
+
 function renderTable(data) {
   const tbody = document.getElementById('tableBody');
   if (data.length === 0) {
@@ -218,23 +222,23 @@ function renderTable(data) {
   let html = '';
   for (const p of data) {
     html += `
-            <tr>
-                <td>${escapeHtml(p.model)}</td>
-                <td>${escapeHtml(p.brand)}</td>
-                <td>${escapeHtml(p.screenRatio || '-')}</td>
-                <td>${p.screenSize !== null ? p.screenSize : '-'}</td>
-                <td>${p.width !== null ? p.width : '-'}</td>
-                <td>${p.thickness !== null ? p.thickness : '-'}</td>
-                <td>${p.weight !== null ? p.weight : '-'}</td>
-                <td>${p.battery !== null ? p.battery : '-'}</td>
-                <td>${p.year ?? '-'}</td>
-                <td>${escapeHtml(p.soc || '-')}</td>
-                <td>${p.type}</td>
-            </tr>
-        `;
+      <tr>
+        <td>${formatModelLink(p.model, p.url)}</td>
+        <td>${escapeHtml(p.brand || '')}</td>
+        <td>${escapeHtml(p.screenRatio || '')}</td>
+        <td>${p.screenSize !== null ? p.screenSize : ''}</td>
+        <td>${p.width !== null ? p.width : ''}</td>
+        <td>${p.thickness !== null ? p.thickness : ''}</td>
+        <td>${p.weight !== null ? p.weight : ''}</td>
+        <td>${p.battery !== null ? p.battery : ''}</td>
+        <td>${escapeHtml(p.soc || '')}</td>
+        <td>${p.year ?? ''}</td>
+        <td>${escapeHtml(p.remark || '')}</td>
+      </tr>
+    `;
   }
   tbody.innerHTML = html;
-  document.getElementById('statsInfo').innerHTML = `显示 ${data.length} / ${phonesData.length} 款`;
+  document.getElementById('statsInfo').innerHTML = `已筛选 ${data.length} / ${phonesData.length} 款`;
 }
 
 function renderCards(data) {
@@ -245,25 +249,27 @@ function renderCards(data) {
   }
   let html = '';
   for (const p of data) {
+    const formatValue = (val, unit) => (val !== null && val !== undefined && val !== '') ? val + unit : '';
+
     html += `
-            <div class="phone-card">
-                <div class="card-header">
-                    <span class="model-name">${escapeHtml(p.model)}</span>
-                    <span class="brand-name">${escapeHtml(p.brand)}</span>
-                </div>
-                <div class="card-detail">
-                    <div class="detail-item"><span class="detail-label">比例</span><span>${escapeHtml(p.screenRatio || '-')}</span></div>
-                    <div class="detail-item"><span class="detail-label">屏幕</span><span>${p.screenSize ?? '-'}"</span></div>
-                    <div class="detail-item"><span class="detail-label">宽度</span><span>${p.width !== null ? p.width + 'mm' : '-'}</span></div>
-                    <div class="detail-item"><span class="detail-label">厚度</span><span>${p.thickness !== null ? p.thickness + 'mm' : '-'}</span></div>
-                    <div class="detail-item"><span class="detail-label">重量</span><span>${p.weight !== null ? p.weight + 'g' : '-'}</span></div>
-                    <div class="detail-item"><span class="detail-label">电池</span><span>${p.battery !== null ? p.battery + 'mAh' : '-'}</span></div>
-                    <div class="detail-item"><span class="detail-label">发布年份</span><span>${p.year ?? '-'}</span></div>
-                    <div class="detail-item"><span class="detail-label">SoC</span><span>${escapeHtml(p.soc || '-')}</span></div>
-                    <div class="detail-item"><span class="detail-label">类型</span><span>${p.type}</span></div>
-                </div>
-            </div>
-        `;
+      <div class="phone-card">
+        <div class="card-header">
+          <span class="model-name">${formatModelLink(p.model, p.url)}</span>
+          <span class="brand-name">${escapeHtml(p.brand)}</span>
+        </div>
+        <div class="card-detail">
+          <div class="detail-item"><span class="detail-label">主屏比例</span><span>${escapeHtml(p.screenRatio || '')}</span></div>
+          <div class="detail-item"><span class="detail-label">主屏尺寸</span><span>${formatValue(p.screenSize, '"')}</span></div>
+          <div class="detail-item"><span class="detail-label">宽度</span><span>${formatValue(p.width, 'mm')}</span></div>
+          <div class="detail-item"><span class="detail-label">厚度</span><span>${formatValue(p.thickness, 'mm')}</span></div>
+          <div class="detail-item"><span class="detail-label">重量</span><span>${formatValue(p.weight, 'g')}</span></div>
+          <div class="detail-item"><span class="detail-label">电池</span><span>${formatValue(p.battery, 'mAh')}</span></div>
+          <div class="detail-item"><span class="detail-label">SoC</span><span>${escapeHtml(p.soc || '')}</span></div>
+          <div class="detail-item"><span class="detail-label">发布年份</span><span>${p.year ?? ''}</span></div>
+        </div>
+        ${p.remark ? `<div class="card-remark"><span class="detail-label">备注</span><span>${escapeHtml(p.remark)}</span></div>` : ''}
+      </div>
+    `;
   }
   container.innerHTML = html;
 }
@@ -387,4 +393,5 @@ function initTypeSwitch() {
 initTypeSwitch();
 bindEvents();
 initTableScrollActivation();   // 新的滚动激活逻辑
-loadCSVAndMetadata();
+initTableScrollActivation();
+loadCSVData();

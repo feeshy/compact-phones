@@ -523,6 +523,21 @@ h1 {
   opacity: 0.7;
 }
 
+.card-remark {
+  margin-top: 0.75rem;
+  padding-top: 0.5rem;
+  border-top: 1px dashed var(--border-light);
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.7rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  .card-remark {
+    border-top-color: var(--border-dark);
+  }
+}
+
 @media (max-width: 760px) {
   .table-wrapper {
     display: none;
