@@ -6,7 +6,8 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
+  pages: write
   id-token: write
 
 jobs:
@@ -19,7 +20,7 @@ jobs:
           ref: main
           path: main_repo
 
-      - name: Restore cached date (previous state)
+      - name: Restore cached date
         id: cache
         uses: actions/cache@v3
         with:
@@ -105,20 +106,12 @@ jobs:
           MODIFIED_TIME=$(cat date.txt)
           DISPLAY_DATE=$(date -d "$MODIFIED_TIME" +%Y/%-m/%-d 2>/dev/null || echo "未知")
           ISO_DATE=$(date -d "$MODIFIED_TIME" +%Y-%m-%d 2>/dev/null || echo "2026-01-01")
-          cd main_repo
-          find . -maxdepth 1 -type f \
-            ! -name ".*" \
-            ! -iname "LICENSE" \
-            ! -iname "README.md" \
-            -exec cp {} ../deploy/ \;
-          for dir in */; do
-            if [ -d "$dir" ]; then
-              cp -r "$dir" ../deploy/ 2>/dev/null || true
-            fi
-          done
+          cp -r main_repo/* deploy/ 2>/dev/null || true
+          cp -r main_repo/.[!.]* deploy/ 2>/dev/null || true
+          cd deploy
+          rm -f LICENSE README.md readme.md 2>/dev/null || true
           cd ..
           cp data.csv deploy/
-          # 使用 | 作为 sed 分隔符，避免日期中的 / 引起冲突
           sed -i "s|{{UPDATE_DATE_DISPLAY}}|${DISPLAY_DATE}|g" deploy/index.html
           sed -i "s|{{UPDATE_DATE_ISO}}|${ISO_DATE}|g" deploy/index.html
 
@@ -129,14 +122,12 @@ jobs:
           path: date.txt
           key: google-drive-modified-time
 
+      - name: Upload artifact
+        if: steps.update.outputs.changed == 'true'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./deploy
+
       - name: Deploy to GitHub Pages
         if: steps.update.outputs.changed == 'true'
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./deploy
-          publish_branch: gh-pages
-          keep_files: false
-          user_name: 'github-actions[bot]'
-          user_email: 'github-actions[bot]@users.noreply.github.com'
-          commit_message: 'Update from Google Drive (modified: ${{ steps.get_time.outputs.modified_time }})'
+        uses: actions/deploy-pages@v4
