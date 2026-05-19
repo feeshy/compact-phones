@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg width="100%" height="100%" viewBox="0 0 768 768" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/">
+<svg width="100%" height="100%" viewBox="0 0 640 640" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/">
     <style>
     * {fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;}
     @media (prefers-color-scheme: light) { path { fill: rgb(108,122,142); } }
     @media (prefers-color-scheme: dark) { path { fill: rgb(255,255,255); } }
     </style>
-    <g transform="translate(-128,-128)">
+    <g transform="translate(-192,-192)">
         <path d="M332,334C328.14,338.168 331.333,366 329,380C327.402,389.586 321.711,400.018 318,407C307.758,426.267 285.833,481.333 279,507C273.852,526.338 276.35,540.999 277,561C277.667,581.5 282,609.667 283,624C283.534,631.648 284.429,639.143 283,647C280.8,659.1 246.061,684.62 250,690C270.166,717.54 376.844,799.608 407,810C412.438,811.874 429.833,777.833 446,768C462.167,758.167 475.249,756.973 495,753C514.333,749.111 550.084,718.584 562,699C562.527,698.134 411.482,699.214 411,699C386.74,688.219 376.766,675.883 371,661C370.731,660.305 371.411,509.666 371,508C369.842,503.31 361.849,499.376 361,492C359.343,477.601 363.667,467.333 367,460C369.717,454.023 370.216,457.109 375,442C375.313,441.013 375.157,355.35 375,355C371.335,346.82 367.625,344.323 361,339C350.627,330.667 336.584,329.05 332,334Z"/>
         <g transform="matrix(1,0,0,1,1,0)">
             <path d="M640.416,643C636.649,667.894 615.138,687 589.2,687L433.8,687C405.211,687 382,663.789 382,635.2L382,274.8C382,246.211 405.211,223 433.8,223L589.2,223C617.789,223 641,246.211 641,274.8L641,424L616,424L616,289L406,289L406,617L604,617L604,643L640.416,643Z"/>
