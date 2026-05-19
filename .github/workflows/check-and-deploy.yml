@@ -104,16 +104,19 @@ jobs:
         run: |
           mkdir -p deploy
           MODIFIED_TIME=$(cat date.txt)
-          DISPLAY_DATE=$(date -d "$MODIFIED_TIME" +%Y/%-m/%-d 2>/dev/null || echo "未知")
-          ISO_DATE=$(date -d "$MODIFIED_TIME" +%Y-%m-%d 2>/dev/null || echo "2026-01-01")
+          DATE_VALUE=$(date -d "$MODIFIED_TIME" +%Y-%m-%d 2>/dev/null || echo "2026-05-18")
+
           cp -r main_repo/* deploy/ 2>/dev/null || true
           cp -r main_repo/.[!.]* deploy/ 2>/dev/null || true
           cd deploy
           rm -f LICENSE README.md readme.md 2>/dev/null || true
           cd ..
+
           cp data.csv deploy/
-          sed -i "s|{{UPDATE_DATE_DISPLAY}}|${DISPLAY_DATE}|g" deploy/index.html
-          sed -i "s|{{UPDATE_DATE_ISO}}|${ISO_DATE}|g" deploy/index.html
+          sed -i "s/{{UPDATE_DATE_DISPLAY}}/${DATE_VALUE}/g" deploy/index.html
+          sed -i "s/{{UPDATE_DATE_ISO}}/${DATE_VALUE}/g" deploy/index.html
+
+          touch deploy/.nojekyll
 
       - name: Save date to cache for next run
         if: steps.update.outputs.changed == 'true'
@@ -122,7 +125,7 @@ jobs:
           path: date.txt
           key: google-drive-modified-time
 
-      - name: Upload artifact
+      - name: Upload Pages artifact
         if: steps.update.outputs.changed == 'true'
         uses: actions/upload-pages-artifact@v3
         with:
