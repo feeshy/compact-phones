@@ -21,7 +21,7 @@
     </div>
     <div class="title-section">
       <h1>小屏手机数据库</h1>
-      <time class="date-badge" id="updateDateBadge" datetime="2026-05-18">更新日期：2026-05-18</time>
+      <time class="date-badge" datetime="{{UPDATE_DATE_ISO}}">数据：{{UPDATE_DATE_DISPLAY}}</time>
     </div>
   </div>
 
@@ -68,16 +68,16 @@
     <div class="sort-group">
       <span>排序依据</span>
       <select id="sortField">
-        <option value="model">型号</option>
+        <option value="model">机型</option>
         <option value="brand">品牌</option>
-        <option value="screenRatio">屏幕比例</option>
-        <option value="screenSize">屏幕尺寸</option>
+        <option value="screenRatio">主屏比例</option>
+        <option value="screenSize">主屏尺寸</option>
         <option value="width" selected>宽度</option>
         <option value="thickness">厚度</option>
         <option value="weight">重量</option>
         <option value="battery">电池</option>
         <option value="year">年份</option>
-        <option value="type">类型</option>
+        <!-- <option value="type">类型</option> -->
         <option value="soc">SoC</option>
       </select>
       <button id="sortOrderBtn">升序</button>
@@ -90,17 +90,17 @@
     <table class="phone-table" id="phoneTable">
       <thead>
         <tr>
-          <th data-field="model">型号</th>
+          <th data-field="model">机型</th>
           <th data-field="brand">品牌</th>
-          <th data-field="screenRatio">屏幕比例</th>
-          <th data-field="screenSize">屏幕尺寸(吋)</th>
-          <th data-field="width">宽度(mm)</th>
-          <th data-field="thickness">厚度(mm)</th>
-          <th data-field="weight">重量(g)</th>
-          <th data-field="battery">电池(mAh)</th>
+          <th data-field="screenRatio">主屏比例</th>
+          <th data-field="screenSize">主屏尺寸</th>
+          <th data-field="width">宽度</th>
+          <th data-field="thickness">厚度</th>
+          <th data-field="weight">重量</th>
+          <th data-field="battery">电池</th>
+          <th data-field="soc">SoC芯片</th>
           <th data-field="year">发布年份</th>
-          <th data-field="soc">SoC</th>
-          <th data-field="type">类型</th>
+          <th data-field="remark">备注</th>
         </tr>
       </thead>
       <tbody id="tableBody">

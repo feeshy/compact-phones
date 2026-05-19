@@ -6,31 +6,16 @@
 
 ## 在线访问
 
-- PWA：https://feeshy.github.io/compact-phones
-- Excel：[OneDrive 链接](https://1drv.ms/x/s!As8fb6-4t65KiqEReU3ZnjF2JWmGsw)  
-- 交流群：https://t.me/compact_phones
+- [Google Sheets](https://docs.google.com/spreadsheets/d/e/2PACX-1vTxyzFWZtixYEqZMLHM_hwnSeSmFjIxIm27YWVMIMZjbfkbsfG6aPLR1fqAFuiyyW6K8znFPuAqVrOj/pubhtml?gid=134994152&single=true)（数据源）
+- [PWA](https://feeshy.github.io/compact-phones)（每日同步）　[![Deploy Status](https://github.com/feeshy/compact-phones/actions/workflows/check-and-deploy.yml/badge.svg?branch=main)](https://github.com/feeshy/compact-phones/actions/workflows/check-and-deploy.yml)
+- [Telegram 交流群](https://t.me/compact_phones)
 
-## 如何提名收录？
+## 提名/纠错
 
-欢迎通过 Pull Request 直接修改 `data.csv` 文件来补充或更正数据。  
+👉 [提交表单](https://forms.gle/51cjQH9zcqCK8aU56)
 
-- 当前提名标准
-  - 直板机：机身宽度 ≤ 72mm 重量 ≤ 200g
-  - 折叠机：机身宽度 ≤ 80mm，重量 ≤ 220g
- 
+当前收录标准：
+- 直板机：机身宽度 ≤ 72 mm，重量 ≤ 200 g
+- 折叠机：机身宽度 ≤ 80 mm，重量 ≤ 220 g
 
-数据以 CSV 格式存储，包含以下字段（按顺序）：
-
-| 字段     | 说明            |
-| -------- | --------------- |
-| 型号     | 手机完整名称    |
-| 品牌     | 制造商          |
-| 屏幕比例 | 如 16:9, 19.5:9 |
-| 屏幕尺寸 | 对角线英寸数    |
-| 宽度     | 机身宽度（mm）  |
-| 厚度     | 机身厚度（mm）  |
-| 重量     | 机身重量（g）   |
-| 电池     | 电池容量（mAh） |
-| 年份     | 发布年份        |
-| SoC      | 处理器型号      |
-| 类型     | 直板机 / 折叠机 |
+> 提交后需人工审核，审核通过的数据会在下一次自动部署中更新到网站。

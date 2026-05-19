@@ -1,0 +1,133 @@
+name: Check and Deploy Google Sheet Data
+
+on:
+  schedule:
+    - cron: '0 0 * * *'          # 每天 UTC 00:00 运行
+  workflow_dispatch:             # 手动触发
+
+permissions:
+  contents: write
+  id-token: write
+
+jobs:
+  check-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main branch (source files)
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          path: main_repo
+
+      - name: Restore cached date (previous state)
+        id: cache
+        uses: actions/cache@v3
+        with:
+          path: date.txt
+          key: google-drive-modified-time
+
+      - name: Install dependencies
+        run: sudo apt-get install -y jq curl
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
+
+      - name: Get Drive file modified time
+        id: get_time
+        env:
+          FILE_ID: '1w9EJ0s4-YbMlEi3NOhVKp-rn3PTQ66kgq4Sodgf7oms'
+        run: |
+          ACCESS_TOKEN=$(gcloud auth print-access-token)
+          MODIFIED_TIME=$(curl -s -H "Authorization: Bearer $ACCESS_TOKEN" \
+            "https://www.googleapis.com/drive/v3/files/${FILE_ID}?fields=modifiedTime" \
+            | jq -r '.modifiedTime')
+          if [ -z "$MODIFIED_TIME" ] || [ "$MODIFIED_TIME" = "null" ]; then
+            echo "Failed to fetch modified time"
+            exit 1
+          fi
+          echo "modified_time=$MODIFIED_TIME" >> $GITHUB_OUTPUT
+
+      - name: Read previous modified time from cache
+        id: read_prev
+        run: |
+          PREV=""
+          if [ -f date.txt ]; then
+            PREV=$(cat date.txt)
+          fi
+          echo "prev_time=$PREV" >> $GITHUB_OUTPUT
+
+      - name: Compare and update if changed
+        id: update
+        run: |
+          CURRENT="${{ steps.get_time.outputs.modified_time }}"
+          PREV="${{ steps.read_prev.outputs.prev_time }}"
+          if [ "$CURRENT" = "$PREV" ]; then
+            echo "No change, exiting."
+            echo "changed=false" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          echo "changed=true" >> $GITHUB_OUTPUT
+
+          # 保存新的修改时间（纯文本）
+          echo "$CURRENT" > date.txt
+
+          # 下载 CSV
+          CSV_URL="https://docs.google.com/spreadsheets/d/e/2PACX-1vTxyzFWZtixYEqZMLHM_hwnSeSmFjIxIm27YWVMIMZjbfkbsfG6aPLR1fqAFuiyyW6K8znFPuAqVrOj/pub?gid=134994152&single=true&output=csv"
+          curl -L "$CSV_URL" -o data.csv
+
+      - name: Prepare deployment folder with injected date
+        if: steps.update.outputs.changed == 'true'
+        run: |
+          mkdir -p deploy
+
+          # 读取当前修改时间并格式化
+          MODIFIED_TIME=$(cat date.txt)
+          DISPLAY_DATE=$(date -d "$MODIFIED_TIME" +%Y/%-m/%-d 2>/dev/null || echo "未知")
+          ISO_DATE=$(date -d "$MODIFIED_TIME" +%Y-%m-%d 2>/dev/null || echo "2026-01-01")
+
+          # 复制静态文件（排除隐藏文件、LICENSE、README.md）
+          cd main_repo
+
+          # 根目录下的文件
+          find . -maxdepth 1 -type f \
+            ! -name ".*" \
+            ! -iname "LICENSE" \
+            ! -iname "README.md" \
+            -exec cp {} ../deploy/ \;
+
+          # 子目录（如 css、js、images 等）
+          for dir in */; do
+            if [ -d "$dir" ]; then
+              cp -r "$dir" ../deploy/ 2>/dev/null || true
+            fi
+          done
+
+          cd ..
+
+          # 复制 CSV
+          cp data.csv deploy/
+
+          # 在 index.html 中注入日期
+          sed -i "s/{{UPDATE_DATE_DISPLAY}}/${DISPLAY_DATE}/g" deploy/index.html
+          sed -i "s/{{UPDATE_DATE_ISO}}/${ISO_DATE}/g" deploy/index.html
+
+      - name: Save date to cache for next run
+        if: steps.update.outputs.changed == 'true'
+        uses: actions/cache@v3
+        with:
+          path: date.txt
+          key: google-drive-modified-time
+
+      - name: Deploy to GitHub Pages
+        if: steps.update.outputs.changed == 'true'
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./deploy
+          publish_branch: gh-pages
+          keep_files: false
+          user_name: 'github-actions[bot]'
+          user_email: 'github-actions[bot]@users.noreply.github.com'
+          commit_message: 'Update from Google Drive (modified: ${{ steps.get_time.outputs.modified_time }})'
