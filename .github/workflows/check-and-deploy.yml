@@ -40,13 +40,32 @@ jobs:
           FILE_ID: '1w9EJ0s4-YbMlEi3NOhVKp-rn3PTQ66kgq4Sodgf7oms'
         run: |
           ACCESS_TOKEN=$(gcloud auth print-access-token)
-          MODIFIED_TIME=$(curl -s -H "Authorization: Bearer $ACCESS_TOKEN" \
-            "https://www.googleapis.com/drive/v3/files/${FILE_ID}?fields=modifiedTime" \
-            | jq -r '.modifiedTime')
-          if [ -z "$MODIFIED_TIME" ] || [ "$MODIFIED_TIME" = "null" ]; then
-            echo "Failed to fetch modified time"
+          if [ -z "$ACCESS_TOKEN" ]; then
+            echo "Error: Failed to obtain access token"
             exit 1
           fi
+          echo "Access token obtained (first 10 chars): ${ACCESS_TOKEN:0:10}..."
+
+          RESPONSE=$(curl -s -w "\n%{http_code}" -H "Authorization: Bearer $ACCESS_TOKEN" \
+            "https://www.googleapis.com/drive/v3/files/${FILE_ID}?fields=modifiedTime")
+          
+          HTTP_STATUS=$(echo "$RESPONSE" | tail -n1)
+          BODY=$(echo "$RESPONSE" | head -n -1)
+          
+          echo "HTTP Status: $HTTP_STATUS"
+          echo "Response body: $BODY"
+          
+          if [ "$HTTP_STATUS" -ne 200 ]; then
+            echo "Failed to fetch modified time (HTTP $HTTP_STATUS)"
+            exit 1
+          fi
+          
+          MODIFIED_TIME=$(echo "$BODY" | jq -r '.modifiedTime')
+          if [ -z "$MODIFIED_TIME" ] || [ "$MODIFIED_TIME" = "null" ]; then
+            echo "Failed to extract modifiedTime from response"
+            exit 1
+          fi
+          
           echo "modified_time=$MODIFIED_TIME" >> $GITHUB_OUTPUT
 
       - name: Read previous modified time from cache
