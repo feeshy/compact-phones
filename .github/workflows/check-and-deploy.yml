@@ -13,6 +13,10 @@ permissions:
   id-token: write
   deployments: write
 
+concurrency:
+  group: pages-deployment
+  cancel-in-progress: false
+
 jobs:
   check-and-deploy:
     runs-on: ubuntu-latest
@@ -23,24 +27,88 @@ jobs:
           ref: main
           path: main_repo
 
-      - name: Restore cached date
-        id: cache
+      # 恢复缓存的 CSV 哈希值（如果存在）
+      - name: Restore cached CSV hash
+        id: cache-hash
         uses: actions/cache@v3
         with:
-          path: date.txt
-          key: google-drive-modified-time
+          path: hash.txt
+          key: data-csv-hash
 
       - name: Install dependencies
         run: sudo apt-get install -y jq curl
 
+      # 下载最新 CSV
+      - name: Download latest CSV
+        id: download
+        run: |
+          CSV_URL="https://docs.google.com/spreadsheets/d/e/2PACX-1vTxyzFWZtixYEqZMLHM_hwnSeSmFjIxIm27YWVMIMZjbfkbsfG6aPLR1fqAFuiyyW6K8znFPuAqVrOj/pub?gid=134994152&single=true&output=csv"
+          curl -L "$CSV_URL" -o data.csv
+          echo "CSV downloaded"
+
+      # 计算当前 CSV 的 MD5 哈希
+      - name: Compute current CSV hash
+        id: hash
+        run: |
+          CURRENT_HASH=$(md5sum data.csv | cut -d' ' -f1)
+          echo "current_hash=$CURRENT_HASH" >> $GITHUB_OUTPUT
+
+      # 读取缓存的旧哈希（如果存在）
+      - name: Read previous hash from cache
+        id: prev
+        run: |
+          if [ -f hash.txt ]; then
+            PREV_HASH=$(cat hash.txt)
+          else
+            PREV_HASH=""
+          fi
+          echo "prev_hash=$PREV_HASH" >> $GITHUB_OUTPUT
+
+      # 根据事件类型决定是否部署
+      - name: Decide whether to deploy
+        id: update
+        run: |
+          FORCE_DEPLOY=false
+          if [[ "${{ github.event_name }}" == "push" ]] || [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            FORCE_DEPLOY=true
+            echo "Force deploy mode: ON (triggered by ${{ github.event_name }})"
+          else
+            echo "Force deploy mode: OFF (triggered by schedule)"
+          fi
+
+          if [ "$FORCE_DEPLOY" = true ]; then
+            echo "changed=true" >> $GITHUB_OUTPUT
+            # 强制部署时，将当前哈希写入 hash.txt 以便下次 schedule 使用
+            echo "${{ steps.hash.outputs.current_hash }}" > hash.txt
+            echo "Forced deployment, will proceed."
+          else
+            CURRENT_HASH="${{ steps.hash.outputs.current_hash }}"
+            PREV_HASH="${{ steps.prev.outputs.prev_hash }}"
+            if [ "$CURRENT_HASH" != "$PREV_HASH" ]; then
+              echo "changed=true" >> $GITHUB_OUTPUT
+              echo "$CURRENT_HASH" > hash.txt
+              echo "Content changed, will deploy."
+            else
+              echo "changed=false" >> $GITHUB_OUTPUT
+              echo "No change, exiting."
+              exit 0
+            fi
+          fi
+
+      # ================ 以下步骤仅在需要部署时执行 ================
+
+      # 仅当需要部署时，才进行 Google Cloud 认证
       - name: Authenticate to Google Cloud
+        if: steps.update.outputs.changed == 'true'
         uses: google-github-actions/auth@v2
         with:
           credentials_json: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
           access_token_scopes: 'https://www.googleapis.com/auth/drive.readonly'
           create_credentials_file: true
 
+      # 仅当需要部署时，获取 Google Drive 文件的修改时间
       - name: Get Drive file modified time
+        if: steps.update.outputs.changed == 'true'
         id: get_time
         env:
           FILE_ID: '1w9EJ0s4-YbMlEi3NOhVKp-rn3PTQ66kgq4Sodgf7oms'
@@ -78,46 +146,12 @@ jobs:
               exit(1)
           EOF
 
-      - name: Read previous modified time from cache
-        id: read_prev
-        run: |
-          PREV=""
-          if [ -f date.txt ]; then
-            PREV=$(cat date.txt)
-          fi
-          echo "prev_time=$PREV" >> $GITHUB_OUTPUT
-
-      - name: Decide whether to deploy and fetch data
-        id: update
-        run: |
-          FORCE_DEPLOY=false
-          if [[ "${{ github.event_name }}" == "push" ]] || [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
-            FORCE_DEPLOY=true
-            echo "Force deploy mode: ON (triggered by ${{ github.event_name }})"
-          else
-            echo "Force deploy mode: OFF (triggered by schedule)"
-          fi
-
-          CURRENT="${{ steps.get_time.outputs.modified_time }}"
-          PREV="${{ steps.read_prev.outputs.prev_time }}"
-
-          if [ "$FORCE_DEPLOY" = true ] || [ "$CURRENT" != "$PREV" ]; then
-            echo "changed=true" >> $GITHUB_OUTPUT
-            echo "$CURRENT" > date.txt
-            CSV_URL="https://docs.google.com/spreadsheets/d/e/2PACX-1vTxyzFWZtixYEqZMLHM_hwnSeSmFjIxIm27YWVMIMZjbfkbsfG6aPLR1fqAFuiyyW6K8znFPuAqVrOj/pub?gid=134994152&single=true&output=csv"
-            curl -L "$CSV_URL" -o data.csv
-            echo "Deployment will proceed."
-          else
-            echo "changed=false" >> $GITHUB_OUTPUT
-            echo "No change, exiting."
-            exit 0
-          fi
-
+      # 注入修改时间到 index.html
       - name: Prepare deployment folder with injected date
         if: steps.update.outputs.changed == 'true'
         run: |
           mkdir -p deploy
-          MODIFIED_TIME=$(cat date.txt)
+          MODIFIED_TIME="${{ steps.get_time.outputs.modified_time }}"
           DATE_VALUE=$(date -d "$MODIFIED_TIME" +%Y-%m-%d 2>/dev/null || echo "2026-05-18")
 
           cp -r main_repo/* deploy/ 2>/dev/null || true
@@ -128,26 +162,29 @@ jobs:
           cd ..
 
           cp data.csv deploy/
-          sed -i "s/{{UPDATE_DATE_DISPLAY}}/${DATE_VALUE}/g" deploy/index.html
-          sed -i "s/{{UPDATE_DATE_ISO}}/${DATE_VALUE}/g" deploy/index.html
+          sed -i "s/{{UPDATE_DATE}}/${DATE_VALUE}/g" deploy/index.html
+
 
           touch deploy/.nojekyll
           echo "Deploy directory contents:"
           ls -la deploy/
 
-      - name: Save date to cache for next run
+      # 保存新的哈希值到缓存（若内容变化或强制部署时已写入）
+      - name: Save new hash to cache
         if: steps.update.outputs.changed == 'true'
-        uses: actions/cache@v3
+        uses: actions/cache/save@v3
         with:
-          path: date.txt
-          key: google-drive-modified-time
+          path: hash.txt
+          key: data-csv-hash
 
+      # 上传 Pages artifact
       - name: Upload Pages artifact
         if: steps.update.outputs.changed == 'true'
         uses: actions/upload-pages-artifact@v3
         with:
           path: ./deploy
 
+      # 创建 GitHub Deployment 记录
       - name: Create GitHub Deployment
         id: create_deployment
         if: steps.update.outputs.changed == 'true'
@@ -167,11 +204,13 @@ jobs:
           echo "deployment_id=$DEPLOYMENT_ID" >> $GITHUB_OUTPUT
           echo "Created deployment with ID: $DEPLOYMENT_ID"
 
+      # 部署到 GitHub Pages
       - name: Deploy to GitHub Pages
         if: steps.update.outputs.changed == 'true'
         id: deploy_pages
         uses: actions/deploy-pages@v4
 
+      # 更新部署状态为成功
       - name: Update Deployment Status (Success)
         if: steps.update.outputs.changed == 'true' && steps.create_deployment.outputs.deployment_id != '' && success()
         run: |
@@ -187,6 +226,7 @@ jobs:
             }'
           echo "Deployment status updated to success"
 
+      # 更新部署状态为失败（如果部署步骤失败）
       - name: Update Deployment Status (Failure)
         if: steps.update.outputs.changed == 'true' && steps.create_deployment.outputs.deployment_id != '' && failure()
         run: |
