@@ -229,7 +229,7 @@ function renderTable(data) {
         <td>${p.screenSize !== null ? p.screenSize + '"' : ''}</td>
         <td>${p.width !== null ? p.width + 'mm' : ''}</td>
         <td>${p.thickness !== null ? p.thickness + 'mm' : ''}</td>
-        <td>${p.weight !== null ? p.weight + 'mm' : ''}</td>
+        <td>${p.weight !== null ? p.weight + 'g' : ''}</td>
         <td>${p.battery !== null ? p.battery + 'mAh' : ''}</td>
         <td>${escapeHtml(p.soc || '')}</td>
         <td>${p.year ?? ''}</td>
