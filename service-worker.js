@@ -1,15 +1,10 @@
 // service-worker.js
-const CACHE_NAME = 'compact-phones-v1';
+const CACHE_NAME = 'compact-phones-v2';
 const urlsToCache = [
   './',
-  './index.html',
   './style.css',
   './script.js',
-  './data.csv',
-  './manifest.json',
-  './favicon.svg',
-  './apple-touch-icon.png',
-  './maskable.svg'
+  './data.csv'
 ];
 
 self.addEventListener('install', event => {
@@ -19,16 +14,19 @@ self.addEventListener('install', event => {
 });
 
 self.addEventListener('fetch', event => {
+
   event.respondWith(
-    caches.match(event.request).then(response => {
-      if (response) return response;
-      return fetch(event.request).then(fetchRes => {
-        if (!fetchRes || fetchRes.status !== 200 || fetchRes.type !== 'basic') return fetchRes;
-        const responseToCache = fetchRes.clone();
-        caches.open(CACHE_NAME).then(cache => cache.put(event.request, responseToCache));
-        return fetchRes;
-      });
-    })
+    fetch(event.request)
+      .then(response => {
+        // 网络请求成功 → 更新缓存并返回新数据
+        const clone = response.clone();
+        caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
+        return response;
+      })
+      .catch(() => {
+        // 网络失败 → 使用上次成功缓存的版本
+        return caches.match(event.request);
+      })
   );
 });
 
