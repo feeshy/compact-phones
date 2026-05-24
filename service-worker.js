@@ -10,6 +10,9 @@ const ASSETS = [
 
 // 1. 安装阶段
 self.addEventListener('install', (event) => {
+
+  self.skipWaiting();
+
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       return Promise.all(
@@ -17,7 +20,7 @@ self.addEventListener('install', (event) => {
           cache.add(url).catch((err) => console.warn('Precache failed:', url, err))
         )
       );
-    }).then(() => self.skipWaiting())
+    })
   );
 });
 
