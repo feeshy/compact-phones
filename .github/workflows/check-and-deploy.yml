@@ -35,6 +35,13 @@ jobs:
         with:
           name: hash-artifact
 
+      - name: Ensure hash file exists
+        run: |
+          if [ ! -f hash.txt ]; then
+            echo "hash.txt not found, creating empty file."
+            touch hash.txt
+          fi
+
       - name: Install dependencies
         run: sudo apt-get install -y jq curl
 
