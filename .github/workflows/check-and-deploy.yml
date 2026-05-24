@@ -174,7 +174,7 @@ jobs:
         run: |
           BUILD_TIME=$(date +'%Y%m%d%H%M%S')
           # 如果你的 SW 文件在根目录：
-          sed -i "s/BUILD_TIME_PLACEHOLDER/$BUILD_TIME/g" ./service-worker.js
+          sed -i "s/BUILD_TIME_PLACEHOLDER/$BUILD_TIME/g" ./deploy/service-worker.js
 
       # 上传 Pages artifact
       - name: Upload Pages artifact
