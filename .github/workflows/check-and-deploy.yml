@@ -27,13 +27,13 @@ jobs:
           ref: main
           path: main_repo
 
-      # 恢复缓存的 CSV 哈希值（如果存在）
-      - name: Restore cached CSV hash
-        id: cache-hash
-        uses: actions/cache@v3
+      # 恢复上次成功部署的 CSV 哈希值（如果存在）
+      - name: Download previous hash artifact
+        id: download-hash
+        uses: actions/download-artifact@v4
+        continue-on-error: true
         with:
-          path: hash.txt
-          key: data-csv-hash
+          name: hash-artifact
 
       - name: Install dependencies
         run: sudo apt-get install -y jq curl
@@ -169,13 +169,12 @@ jobs:
           echo "Deploy directory contents:"
           ls -la deploy/
 
-      # 保存新的哈希值到缓存（若内容变化或强制部署时已写入）
-      - name: Save new hash to cache
-        if: steps.update.outputs.changed == 'true'
-        uses: actions/cache/save@v3
-        with:
-          path: hash.txt
-          key: data-csv-hash
+      # 注入部署时间到 service-worker.js
+      - name: Inject Build Time into SW
+        run: |
+          BUILD_TIME=$(date +'%Y%m%d%H%M%S')
+          # 如果你的 SW 文件在根目录：
+          sed -i "s/BUILD_TIME_PLACEHOLDER/$BUILD_TIME/g" ./service-worker.js
 
       # 上传 Pages artifact
       - name: Upload Pages artifact
@@ -209,6 +208,15 @@ jobs:
         if: steps.update.outputs.changed == 'true'
         id: deploy_pages
         uses: actions/deploy-pages@v4
+
+      # 保存新的哈希值
+      - name: Upload new hash artifact
+        if: steps.update.outputs.changed == 'true' && steps.create_deployment.outputs.deployment_id != '' && success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hash-artifact
+          path: hash.txt
+          overwrite: true
 
       # 更新部署状态为成功
       - name: Update Deployment Status (Success)
