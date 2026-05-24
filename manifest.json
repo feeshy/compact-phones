@@ -2,6 +2,7 @@
   "name": "小屏手机数据库",
   "short_name": "小屏手机",
   "description": "小尺寸手机筛选与排序工具，支持离线使用",
+  "id": "/compact-phones/",
   "scope": "/compact-phones/",
   "start_url": "/compact-phones/",
   "display": "standalone",
