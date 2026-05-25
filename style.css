@@ -1,3 +1,21 @@
+@font-face {
+  font-family: 'Roboto Condensed';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('assets/roboto-condensed-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Roboto Condensed';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('assets/roboto-condensed-greek.woff2') format('woff2');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -19,11 +37,14 @@
 }
 
 body {
-  font-family: system-ui, 'Segoe UI', Roboto, sans-serif;
+  font-family: "SF Pro Condensed", "SF Condensed", "Segoe UI Condensed", "HarmonyOS Sans Condensed", "Roboto Condensed", "Helvetica Neue Condensed", "Ubuntu Condensed", "Ubuntu Mono", "Inconsolata", sans-serif-condensed, system-ui, sans-serif;
+  font-stretch: condensed;
+  font-variant-numeric: tabular-nums lining-nums;
+  font-feature-settings: "tnum" 1, "lnum" 1;
   background: var(--bg-body-light);
   color: var(--text-light);
   padding: 1rem;
-  line-height: 1.4;
+  line-height: 1.25;
   transition: background 0.2s;
 }
 
@@ -62,16 +83,16 @@ body {
 }
 
 .header {
-  border-radius: 1.2rem;
+  border-radius: 1rem;
   padding: 1rem 1.5rem;
-  margin-bottom: 1.2rem;
+  margin-bottom: 1rem;
 }
 
 .title-section {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
-  align-items: baseline;
+  align-items: center;
   gap: 0.5rem;
   margin-bottom: 0.6rem;
 }
@@ -83,10 +104,11 @@ h1 {
 }
 
 .date-badge {
+  text-align: right;
   font-size: 0.75rem;
   background: var(--bg-body-light);
   padding: 0.2rem 0.7rem;
-  border-radius: 30px;
+  border-radius: 0.75rem;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -112,8 +134,8 @@ h1 {
 
 /* 筛选项网格布局 - 固定尺寸 160x64 每项 */
 .filters-grid {
-  border-radius: 1.2rem;
-  padding: 1rem;
+  border-radius: 1rem;
+  padding: 1rem 1.5rem;
   margin-bottom: 1rem;
 }
 
@@ -121,26 +143,25 @@ h1 {
   display: grid;
   grid-template-columns: repeat(6, 15%);
   gap: 1rem;
-  justify-content: space-evenly;
-  /* 分散对齐，左右不留白 */
+  justify-content: space-between;
   align-items: start;
 }
 
 /* 响应式：当容器宽度不足时，自动减少列数，每行数量仍相同 */
 
-@media (max-width: 1279px) {
+@media (max-width: 1280px) {
   .filter-grid {
     grid-template-columns: repeat(3, 30%);
   }
 }
 
-@media (max-width: 639px) {
+@media (max-width: 640px) {
   .filter-grid {
     grid-template-columns: repeat(2, 45%);
   }
 }
 
-@media (max-width: 479px) {
+@media (max-width: 480px) {
   .filter-grid {
     grid-template-columns: repeat(1, 100%);
   }
@@ -177,6 +198,7 @@ h1 {
 }
 
 /* 普通数值输入框 */
+
 .num-input {
   width: 96px;
   height: 34px;
@@ -237,6 +259,17 @@ h1 {
   }
 }
 
+/* 隐藏输入框的上下箭头 */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
 /* 类型切换开关组 */
 .type-switch-group {
   width: 128px;
@@ -286,17 +319,18 @@ h1 {
   align-items: center;
   gap: 12px;
   margin-bottom: 1rem;
-  padding: 0.5rem 1rem;
-  border-radius: 50px;
+  padding: 1rem 1.5rem;
+  border-radius: 1rem;
 }
 
 .sort-group {
+  font-size: 0.75rem;
   display: flex;
   gap: 8px;
   align-items: center;
   background: var(--bg-body-light);
   padding: 4px 12px;
-  border-radius: 40px;
+  border-radius: 0.75rem;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -326,21 +360,6 @@ h1 {
   }
 }
 
-.stats {
-  background: var(--bg-body-light);
-  padding: 5px 12px;
-  border-radius: 40px;
-  font-size: 0.75rem;
-  font-weight: 500;
-}
-
-@media (prefers-color-scheme: dark) {
-  .stats {
-    background: var(--bg-body-dark);
-    color: var(--text-dark);
-  }
-}
-
 .reset-btn {
   background: var(--accent-low-sat);
   border: none;
@@ -361,7 +380,7 @@ h1 {
   position: relative;
   border-radius: 1rem;
   overflow: auto;
-  max-height: 70vh;
+  max-height: 65vh;
 }
 
 .phone-table {
@@ -374,7 +393,6 @@ h1 {
 
 .phone-table td,
 .phone-table th {
-  font-family: 'SF Mono', 'Menlo', 'Consolas', 'Courier New', monospace;
   padding: 0.7rem 0.8rem;
   border-bottom: 1px solid var(--border-light);
   border-right: 1px solid var(--border-light);
@@ -523,7 +541,7 @@ h1 {
   }
 }
 
-@media (max-width: 760px) {
+@media (max-width: 640px) {
   .table-wrapper {
     display: none;
   }
@@ -534,8 +552,12 @@ h1 {
 }
 
 footer {
+  max-width: 300px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
   text-align: center;
-  margin-top: 1.5rem;
+  margin-top: 1rem;
   font-size: 0.8rem;
   line-height: 2;
   opacity: 0.7;

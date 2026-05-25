@@ -9,11 +9,7 @@ const weightInput = document.getElementById('weightMax');
 const batteryInput = document.getElementById('batteryMin');
 
 // 类型开关
-let currentTypeFilter = "直板";
-
-// 表格滚动激活标志（点击表格后激活）
-let tableScrollActive = false;
-let tableWrapper = null;
+let currentTypeFilter = "all";
 
 // 年份范围输入框初始化
 function initYearRange() {
@@ -51,7 +47,7 @@ async function loadCSVData() {
     parseCSV(csvText);
   } catch (error) {
     console.error(error);
-    document.getElementById('tableBody').innerHTML = '<tr><td colspan="11">数据加载失败，请确保 data.csv 文件存在</td></tr>';
+    document.getElementById('tableBody').innerHTML = '<tr><td colspan="11">数据加载失败，请访问 <a href="https://docs.google.com/spreadsheets/d/e/2PACX-1vTxyzFWZtixYEqZMLHM_hwnSeSmFjIxIm27YWVMIMZjbfkbsfG6aPLR1fqAFuiyyW6K8znFPuAqVrOj/pubhtml?gid=134994152&single=true" target="_blank">Google Sheet</a> 查看源数据</td></tr>';
     document.getElementById('statsInfo').innerText = '加载失败';
   }
 }
@@ -105,10 +101,49 @@ function parseCSV(csv) {
   }
   phonesData = data;
   initYearRange();
+  getMaxValue();
   setDefaultFilters();
   refresh();
 }
 
+// 计算直板/折叠机的最大宽度和最大重量
+function getMaxValue() {
+  if (phonesData.length === 0) return;
+
+  const slabWidths = [];
+  const slabWeights = [];
+  const foldWidths = [];
+  const foldWeights = [];
+
+  for (const p of phonesData) {
+    if (p.type === '直板') {
+      if (p.width !== null) slabWidths.push(p.width);
+      if (p.weight !== null) slabWeights.push(p.weight);
+    } else if (p.type === '折叠') {
+      if (p.width !== null) foldWidths.push(p.width);
+      if (p.weight !== null) foldWeights.push(p.weight);
+    }
+  }
+
+  const ceilNum = (num) => Math.ceil(num);
+
+  const slabEl = document.getElementById('maxValueSlab');
+  const foldEl = document.getElementById('maxValueFoldable');
+
+  if (slabEl && slabWidths.length > 0 && slabWeights.length > 0) {
+    const maxW = Math.max(...slabWidths);
+    const maxG = Math.max(...slabWeights);
+    slabEl.innerHTML = '<br>收录直板机 宽≤' + ceilNum(maxW) + 'mm 重≤' + ceilNum(maxG) + 'g';
+  }
+
+  if (foldEl && foldWidths.length > 0 && foldWeights.length > 0) {
+    const maxW = Math.max(...foldWidths);
+    const maxG = Math.max(...foldWeights);
+    foldEl.innerHTML = '<br>收录折叠机 宽≤' + ceilNum(maxW) + 'mm 重≤' + ceilNum(maxG) + 'g';
+  }
+}
+
+// 数据筛选
 function setDefaultFilters() {
   widthInput.value = 72;
   weightInput.value = 200;
@@ -318,62 +353,6 @@ function bindEvents() {
   });
 }
 
-// 优化滚动逻辑：点击表格区域激活表格滚动，点击其他区域取消激活
-function initTableScrollActivation() {
-  tableWrapper = document.querySelector('.table-wrapper');
-  if (!tableWrapper) return;
-
-  // 激活表格滚动（仅当点击表格内部时）
-  const activateTableScroll = () => {
-    tableScrollActive = true;
-    tableWrapper.style.outline = '2px solid var(--accent-low-sat)';
-    tableWrapper.style.outlineOffset = '-1px';
-  };
-  const deactivateTableScroll = () => {
-    tableScrollActive = false;
-    tableWrapper.style.outline = 'none';
-  };
-
-  // 点击表格内部激活
-  tableWrapper.addEventListener('click', (e) => {
-    e.stopPropagation();
-    activateTableScroll();
-  });
-  // 点击文档其他位置取消激活
-  document.addEventListener('click', (e) => {
-    if (!tableWrapper.contains(e.target)) {
-      deactivateTableScroll();
-    }
-  });
-  // 可选：按 ESC 键取消激活
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && tableScrollActive) {
-      deactivateTableScroll();
-    }
-  });
-
-  // 滚动事件：仅当激活时才阻止页面滚动并滚动表格
-  tableWrapper.addEventListener('wheel', (e) => {
-    if (tableScrollActive) {
-      e.preventDefault();
-      tableWrapper.scrollTop += e.deltaY;
-    }
-  }, { passive: false });
-
-  let touchStartY = 0;
-  tableWrapper.addEventListener('touchstart', (e) => {
-    touchStartY = e.touches[0].clientY;
-  });
-  tableWrapper.addEventListener('touchmove', (e) => {
-    if (tableScrollActive) {
-      const deltaY = e.touches[0].clientY - touchStartY;
-      e.preventDefault();
-      tableWrapper.scrollTop -= deltaY;
-      touchStartY = e.touches[0].clientY;
-    }
-  }, { passive: false });
-}
-
 function initTypeSwitch() {
   const btns = document.querySelectorAll('#typeSwitchGroup .type-option');
   btns.forEach(btn => {
@@ -385,13 +364,11 @@ function initTypeSwitch() {
       refresh();
     });
   });
-  const defaultBtn = [...btns].find(b => b.getAttribute('data-type') === '直板');
+  const defaultBtn = [...btns].find(b => b.getAttribute('data-type') === 'all');
   if (defaultBtn) defaultBtn.classList.add('active');
 }
 
 // 启动
 initTypeSwitch();
 bindEvents();
-initTableScrollActivation();   // 新的滚动激活逻辑
-initTableScrollActivation();
 loadCSVData();

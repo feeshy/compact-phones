@@ -9,13 +9,13 @@
   "background_color": "#f5f5f5",
   "icons": [
     {
-      "src": "favicon.svg",
+      "src": "assets/favicon.svg",
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any"
     },
     {
-      "src": "maskable.svg",
+      "src": "assets/maskable.svg",
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "maskable"
