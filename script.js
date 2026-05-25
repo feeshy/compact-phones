@@ -133,13 +133,13 @@ function getMaxValue() {
   if (slabEl && slabWidths.length > 0 && slabWeights.length > 0) {
     const maxW = Math.max(...slabWidths);
     const maxG = Math.max(...slabWeights);
-    slabEl.innerHTML = '<br>收录直板机 宽≤' + ceilNum(maxW) + 'mm 重≤' + ceilNum(maxG) + 'g';
+    slabEl.innerHTML = '<br>直板机 ≤' + ceilNum(maxW) + 'mm ≤' + ceilNum(maxG) + 'g';
   }
 
   if (foldEl && foldWidths.length > 0 && foldWeights.length > 0) {
     const maxW = Math.max(...foldWidths);
     const maxG = Math.max(...foldWeights);
-    foldEl.innerHTML = '<br>收录折叠机 宽≤' + ceilNum(maxW) + 'mm 重≤' + ceilNum(maxG) + 'g';
+    foldEl.innerHTML = '<br>折叠机 ≤' + ceilNum(maxW) + 'mm ≤' + ceilNum(maxG) + 'g';
   }
 }
 
