@@ -9,7 +9,7 @@
   <meta name="keywords" content="小屏手机,紧凑型手机,小尺寸手机,小屏手机数据库,compact phones,コンパクトスマホ">
   <link rel="stylesheet" href="style.css">
   <link rel="manifest" href="manifest.json">
-  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
 </head>
 
 <body>
@@ -21,7 +21,8 @@
     </div>
     <div class="title-section">
       <h1>小屏手机数据库</h1>
-      <time class="date-badge" datetime="{{UPDATE_DATE}}">数据：{{UPDATE_DATE}}</time>
+      <span class="date-badge"><time datetime="{{UPDATE_DATE}}">数据：{{UPDATE_DATE}}</time><span id="maxValueSlab"></span><span id="maxValueFoldable"></span></span>
+      <!-- <p>收录直板机 宽≤72mm 重≤200g<br>收录折叠机 宽≤80mm 重≤220g</p> -->
     </div>
   </div>
 
@@ -46,7 +47,7 @@
       </div>
       <div class="filter-item">
         <label>宽度</label>
-        <div class="num-input"><input type="number" id="widthMax" step="0.1" placeholder=""><span>mm</span></div>
+        <div class="num-input">≤<input type="number" id="widthMax" step="0.1" placeholder=""><span>mm</span></div>
       </div>
       <div class="filter-item">
         <label>厚度</label>
@@ -58,7 +59,7 @@
       </div>
       <div class="filter-item">
         <label>电池</label>
-        <div class="num-input">≤<input type="number" id="batteryMin" step="50" placeholder=""><span>mAh</span></div>
+        <div class="num-input">≥<input type="number" id="batteryMin" step="50" placeholder=""><span>mAh</span></div>
       </div>
     </div>
   </div>
@@ -66,7 +67,7 @@
   <!-- 工具栏 -->
   <div class="action-bar">
     <div class="sort-group">
-      <span>排序依据</span>
+      <span>排序</span>
       <select id="sortField">
         <option value="model">机型</option>
         <option value="brand">品牌</option>
@@ -82,7 +83,10 @@
       </select>
       <button id="sortOrderBtn">升序</button>
     </div>
-    <button class="reset-btn" id="resetFilters">重置筛选</button>
+    <div class="sort-group">
+      <span id="statsInfo">已筛选 / 款</span>
+      <button class="reset-btn" id="resetFilters">重置</button>
+    </div>
   </div>
 
   <!-- 表格区域 -->
@@ -113,13 +117,10 @@
 
   <!-- 卡片容器 -->
   <div class="cards-view" id="cardsContainer"></div>
+
+  <!-- 底部信息 -->
   <footer>
-    <div class="standard-box">
-      <p class="stats" id="statsInfo">加载中...</p>
-      <p>收录直板机 宽≤72mm 重≤200g</p>
-      <p>收录折叠机 宽≤80mm 重≤220g</p>
-      <p><a href="https://docs.google.com/spreadsheets/d/e/2PACX-1vTxyzFWZtixYEqZMLHM_hwnSeSmFjIxIm27YWVMIMZjbfkbsfG6aPLR1fqAFuiyyW6K8znFPuAqVrOj/pubhtml?gid=134994152&single=true" target="_blank">Google Sheet</a> | <a href="https://forms.gle/51cjQH9zcqCK8aU56" target="_blank">提名</a> | <a href="https://github.com/feeshy/compact-phones" target="_blank">源码</a> | <a href="https://t.me/compact_phones" target="_blank">交流群</a></p>
-    </div>
+    <a href="https://docs.google.com/spreadsheets/d/e/2PACX-1vTxyzFWZtixYEqZMLHM_hwnSeSmFjIxIm27YWVMIMZjbfkbsfG6aPLR1fqAFuiyyW6K8znFPuAqVrOj/pubhtml?gid=134994152&single=true" target="_blank">数据源</a>|<a href="https://forms.gle/51cjQH9zcqCK8aU56" target="_blank">提名</a>|<a href="https://github.com/feeshy/compact-phones" target="_blank">源码</a>|<a href="https://t.me/compact_phones" target="_blank">交流群</a>
   </footer>
   </div>
 
