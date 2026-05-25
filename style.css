@@ -43,9 +43,20 @@ body {
   font-feature-settings: "tnum" 1, "lnum" 1;
   background: var(--bg-body-light);
   color: var(--text-light);
-  padding: 1.5rem;
+  padding: clamp(0px, (100vw - 320px) / (1280 - 320) * 40, 40px);
+  max-width: 1280px;
+  margin: 0 auto;
   line-height: 1.25;
   transition: background 0.2s;
+}
+
+@media (max-width:375px) {
+
+  #dateUpdate,
+  #maxValueSlab,
+  #maxValueFoldable {
+    display: none;
+  }
 }
 
 @media (prefers-color-scheme: dark) {
@@ -53,11 +64,6 @@ body {
     background: var(--bg-body-dark);
     color: var(--text-dark);
   }
-}
-
-.container {
-  max-width: 1400px;
-  margin: 0 auto;
 }
 
 /* 头部等卡片背景 */
@@ -119,7 +125,7 @@ h1 {
 
 .links {
   display: flex;
-  gap: 1.2rem;
+  gap: 1rem;
   font-size: 0.8rem;
 }
 
@@ -168,7 +174,7 @@ h1 {
 }
 
 .filter-item {
-  height: 48px;
+  height: 36px;
   background: var(--bg-body-light);
   border-radius: 0.75rem;
   border: 1px solid var(--border-light);
@@ -176,7 +182,7 @@ h1 {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 6px;
+  gap: 4px;
   box-sizing: border-box;
 }
 
@@ -201,7 +207,7 @@ h1 {
 
 .num-input {
   width: 96px;
-  height: 34px;
+  height: 24px;
   display: flex;
   align-items: center;
   background: var(--bg-surface-light);
@@ -230,17 +236,17 @@ h1 {
 
 /* 年份范围专用：两个输入框并排 */
 .year-range {
-  width: 100px;
-  height: 34px;
+  width: 96px;
+  height: 24px;
   display: flex;
-  gap: 4px;
+  gap: 2px;
   align-items: center;
   flex-shrink: 0;
 }
 
 .year-num {
   width: 45px;
-  height: 34px;
+  height: 24px;
   background: var(--bg-surface-light);
   border: 1px solid var(--border-light);
   border-radius: 60px;
@@ -272,12 +278,12 @@ input[type="number"] {
 
 /* 类型切换开关组 */
 .type-switch-group {
-  width: 128px;
-  height: 34px;
+  width: 96px;
+  height: 24px;
   display: flex;
-  gap: 4px;
+  gap: 0px;
   background: var(--bg-surface-light);
-  border-radius: 34px;
+  border-radius: 24px;
   padding: 2px;
   flex-shrink: 0;
 }
@@ -286,8 +292,7 @@ input[type="number"] {
   flex: 1;
   font-size: 0.65rem;
   padding: 0;
-  border-radius: 30px;
-  line-height: 30px;
+  border-radius: 20px;
   text-align: center;
   background: transparent;
   border: none;
@@ -314,10 +319,11 @@ input[type="number"] {
 /* 工具栏 */
 .action-bar {
   display: flex;
+  flex-direction: row-reverse;
   flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
-  gap: 12px;
+  gap: 4px;
   margin-bottom: 1rem;
   padding: 0.8rem 1.2rem;
   border-radius: 1rem;
@@ -326,10 +332,10 @@ input[type="number"] {
 .sort-group {
   font-size: 0.75rem;
   display: flex;
-  gap: 8px;
+  gap: 2px;
   align-items: center;
   background: var(--bg-body-light);
-  padding: 4px 12px;
+  padding: 4px 8px;
   border-radius: 0.75rem;
 }
 
@@ -380,7 +386,7 @@ input[type="number"] {
   position: relative;
   border-radius: 1rem;
   overflow: auto;
-  max-height: 65vh;
+  max-height: 85vh;
 }
 
 .phone-table {
@@ -465,7 +471,7 @@ input[type="number"] {
 /* 卡片视图 (移动端) */
 .cards-view {
   display: none;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
   gap: 1rem;
 }
 
@@ -503,7 +509,7 @@ input[type="number"] {
 .card-detail {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 6px 10px;
+  gap: 2px 10px;
   margin-top: 8px;
   font-size: 0.7rem;
 }
@@ -541,7 +547,7 @@ input[type="number"] {
   }
 }
 
-@media (max-width: 640px) {
+@media (max-width: 700px) {
   .table-wrapper {
     display: none;
   }
