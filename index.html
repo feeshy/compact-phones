@@ -21,107 +21,110 @@
     </div>
     <div class="title-section">
       <h1>小屏手机数据库</h1>
-      <span class="date-badge"><time datetime="{{UPDATE_DATE}}">数据：{{UPDATE_DATE}}</time><span id="maxValueSlab"></span><span id="maxValueFoldable"></span></span>
-      <!-- <p>收录直板机 宽≤72mm 重≤200g<br>收录折叠机 宽≤80mm 重≤220g</p> -->
+      <span class="date-badge">
+        <span>更新: <time datetime="{{UPDATE_DATE}}">{{UPDATE_DATE}}</time></span>
+        <span id="maxValueSlab"></span>
+        <span id="maxValueFoldable"></span>
+      </span>
     </div>
-  </div>
 
-  <!-- 六个筛选项网格 -->
-  <div class="filters-grid">
-    <div class="filter-grid">
-      <div class="filter-item">
-        <label>发布年份</label>
-        <div class="year-range">
-          <input type="number" id="yearFrom" placeholder="起始" class="year-num">
-          <span>-</span>
-          <input type="number" id="yearTo" placeholder="结束" class="year-num">
+    <!-- 六个筛选项网格 -->
+    <div class="filters-grid">
+      <div class="filter-grid">
+        <div class="filter-item">
+          <label>年份</label>
+          <div class="year-range">
+            <input type="number" id="yearFrom" placeholder="起始" class="year-num">
+            <span>-</span>
+            <input type="number" id="yearTo" placeholder="结束" class="year-num">
+          </div>
+        </div>
+        <div class="filter-item">
+          <label>类型</label>
+          <div class="type-switch-group" id="typeSwitchGroup">
+            <button data-type="all" class="type-option">全部</button>
+            <button data-type="直板" class="type-option">直板</button>
+            <button data-type="折叠" class="type-option">折叠</button>
+          </div>
+        </div>
+        <div class="filter-item">
+          <label>宽度</label>
+          <div class="num-input">≤<input type="number" id="widthMax" step="0.1" placeholder=""><span>mm</span></div>
+        </div>
+        <div class="filter-item">
+          <label>厚度</label>
+          <div class="num-input">≤<input type="number" id="thickMax" step="0.1" placeholder=""><span>mm</span></div>
+        </div>
+        <div class="filter-item">
+          <label>重量</label>
+          <div class="num-input">≤<input type="number" id="weightMax" step="1" placeholder=""><span>g</span></div>
+        </div>
+        <div class="filter-item">
+          <label>电池</label>
+          <div class="num-input">≥<input type="number" id="batteryMin" step="50" placeholder=""><span>mAh</span></div>
         </div>
       </div>
-      <div class="filter-item">
-        <label>类型</label>
-        <div class="type-switch-group" id="typeSwitchGroup">
-          <button data-type="all" class="type-option">全部</button>
-          <button data-type="直板" class="type-option">直板</button>
-          <button data-type="折叠" class="type-option">折叠</button>
-        </div>
-      </div>
-      <div class="filter-item">
-        <label>宽度</label>
-        <div class="num-input">≤<input type="number" id="widthMax" step="0.1" placeholder=""><span>mm</span></div>
-      </div>
-      <div class="filter-item">
-        <label>厚度</label>
-        <div class="num-input">≤<input type="number" id="thickMax" step="0.1" placeholder=""><span>mm</span></div>
-      </div>
-      <div class="filter-item">
-        <label>重量</label>
-        <div class="num-input">≤<input type="number" id="weightMax" step="1" placeholder=""><span>g</span></div>
-      </div>
-      <div class="filter-item">
-        <label>电池</label>
-        <div class="num-input">≥<input type="number" id="batteryMin" step="50" placeholder=""><span>mAh</span></div>
-      </div>
     </div>
-  </div>
 
-  <!-- 工具栏 -->
-  <div class="action-bar">
-    <div class="sort-group">
-      <span>排序</span>
-      <select id="sortField">
-        <option value="model">机型</option>
-        <option value="brand">品牌</option>
-        <option value="screenRatio">主屏比例</option>
-        <option value="screenSize">主屏尺寸</option>
-        <option value="width" selected>宽度</option>
-        <option value="thickness">厚度</option>
-        <option value="weight">重量</option>
-        <option value="battery">电池</option>
-        <option value="year">年份</option>
-        <!-- <option value="type">类型</option> -->
-        <option value="soc">SoC</option>
-      </select>
-      <button id="sortOrderBtn">升序</button>
+    <!-- 工具栏 -->
+    <div class="action-bar">
+      <div class="sort-group">
+        <!-- <span>排序</span> -->
+        <button id="sortOrderBtn">⬆️</button>
+        <select id="sortField">
+          <option value="model">机型</option>
+          <option value="brand">品牌</option>
+          <option value="screenRatio">比例</option>
+          <option value="screenSize">尺寸</option>
+          <option value="width" selected>宽度</option>
+          <option value="thickness">厚度</option>
+          <option value="weight">重量</option>
+          <option value="battery">电池</option>
+          <option value="soc">SoC</option>
+          <option value="year">年份</option>
+        </select>
+        &nbsp;
+        <span id="statsInfo">/</span>
+        <button class="reset-btn" id="resetFilters">🔄</button>
+      </div>
+      <!-- <div class="sort-group">
+        
+      </div> -->
     </div>
-    <div class="sort-group">
-      <span id="statsInfo">已筛选 / 款</span>
-      <button class="reset-btn" id="resetFilters">重置</button>
+
+    <!-- 表格区域 -->
+    <div class="table-wrapper">
+      <table class="phone-table" id="phoneTable">
+        <thead>
+          <tr>
+            <th data-field="model">机型</th>
+            <th data-field="brand">品牌</th>
+            <th data-field="screenRatio">主屏比例</th>
+            <th data-field="screenSize">主屏尺寸</th>
+            <th data-field="width">宽度</th>
+            <th data-field="thickness">厚度</th>
+            <th data-field="weight">重量</th>
+            <th data-field="battery">电池</th>
+            <th data-field="soc">SoC芯片</th>
+            <th data-field="year">发布年份</th>
+            <th data-field="remark">备注</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody">
+          <tr>
+            <td colspan="11" class="loading">加载数据中...</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
-  </div>
 
-  <!-- 表格区域 -->
-  <div class="table-wrapper">
-    <table class="phone-table" id="phoneTable">
-      <thead>
-        <tr>
-          <th data-field="model">机型</th>
-          <th data-field="brand">品牌</th>
-          <th data-field="screenRatio">主屏比例</th>
-          <th data-field="screenSize">主屏尺寸</th>
-          <th data-field="width">宽度</th>
-          <th data-field="thickness">厚度</th>
-          <th data-field="weight">重量</th>
-          <th data-field="battery">电池</th>
-          <th data-field="soc">SoC芯片</th>
-          <th data-field="year">发布年份</th>
-          <th data-field="remark">备注</th>
-        </tr>
-      </thead>
-      <tbody id="tableBody">
-        <tr>
-          <td colspan="11" class="loading">加载数据中...</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+    <!-- 卡片容器 -->
+    <div class="cards-view" id="cardsContainer"></div>
 
-  <!-- 卡片容器 -->
-  <div class="cards-view" id="cardsContainer"></div>
-
-  <!-- 底部信息 -->
-  <footer>
-    <a href="https://docs.google.com/spreadsheets/d/e/2PACX-1vTxyzFWZtixYEqZMLHM_hwnSeSmFjIxIm27YWVMIMZjbfkbsfG6aPLR1fqAFuiyyW6K8znFPuAqVrOj/pubhtml?gid=134994152&single=true" target="_blank">数据源</a>|<a href="https://forms.gle/51cjQH9zcqCK8aU56" target="_blank">提名</a>|<a href="https://github.com/feeshy/compact-phones" target="_blank">源码</a>|<a href="https://t.me/compact_phones" target="_blank">交流群</a>
-  </footer>
+    <!-- 底部信息 -->
+    <footer>
+      <a href="https://docs.google.com/spreadsheets/d/e/2PACX-1vTxyzFWZtixYEqZMLHM_hwnSeSmFjIxIm27YWVMIMZjbfkbsfG6aPLR1fqAFuiyyW6K8znFPuAqVrOj/pubhtml?gid=134994152&single=true" target="_blank">数据源</a>|<a href="https://forms.gle/51cjQH9zcqCK8aU56" target="_blank">提名</a>|<a href="https://github.com/feeshy/compact-phones" target="_blank">源码</a>|<a href="https://t.me/compact_phones" target="_blank">交流群</a>
+    </footer>
   </div>
 
   <script src="script.js"></script>

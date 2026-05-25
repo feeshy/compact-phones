@@ -47,8 +47,8 @@ async function loadCSVData() {
     parseCSV(csvText);
   } catch (error) {
     console.error(error);
-    document.getElementById('tableBody').innerHTML = '<tr><td colspan="11">数据加载失败，请访问 <a href="https://docs.google.com/spreadsheets/d/e/2PACX-1vTxyzFWZtixYEqZMLHM_hwnSeSmFjIxIm27YWVMIMZjbfkbsfG6aPLR1fqAFuiyyW6K8znFPuAqVrOj/pubhtml?gid=134994152&single=true" target="_blank">Google Sheet</a> 查看源数据</td></tr>';
-    document.getElementById('statsInfo').innerText = '加载失败';
+    document.getElementById('tableBody').innerHTML = '<tr><td colspan="11">加载失败，请访问 <a href="https://docs.google.com/spreadsheets/d/e/2PACX-1vTxyzFWZtixYEqZMLHM_hwnSeSmFjIxIm27YWVMIMZjbfkbsfG6aPLR1fqAFuiyyW6K8znFPuAqVrOj/pubhtml?gid=134994152&single=true" target="_blank">Google Sheet</a> 查看源数据</td></tr>';
+    document.getElementById('statsInfo').innerText = '0/0';
   }
 }
 
@@ -133,13 +133,13 @@ function getMaxValue() {
   if (slabEl && slabWidths.length > 0 && slabWeights.length > 0) {
     const maxW = Math.max(...slabWidths);
     const maxG = Math.max(...slabWeights);
-    slabEl.innerHTML = '<br>直板机 ≤' + ceilNum(maxW) + 'mm ≤' + ceilNum(maxG) + 'g';
+    slabEl.innerHTML = '<br>直板 ≤' + ceilNum(maxW) + 'mm, ' + ceilNum(maxG) + 'g';
   }
 
   if (foldEl && foldWidths.length > 0 && foldWeights.length > 0) {
     const maxW = Math.max(...foldWidths);
     const maxG = Math.max(...foldWeights);
-    foldEl.innerHTML = '<br>折叠机 ≤' + ceilNum(maxW) + 'mm ≤' + ceilNum(maxG) + 'g';
+    foldEl.innerHTML = '<br>折叠 ≤' + ceilNum(maxW) + 'mm, ' + ceilNum(maxG) + 'g';
   }
 }
 
@@ -273,7 +273,7 @@ function renderTable(data) {
     `;
   }
   tbody.innerHTML = html;
-  document.getElementById('statsInfo').innerHTML = `已筛选 ${data.length} / ${phonesData.length} 款`;
+  document.getElementById('statsInfo').innerHTML = `${data.length} / ${phonesData.length}`;
 }
 
 function renderCards(data) {
@@ -311,7 +311,7 @@ function renderCards(data) {
 
 function updateSortButtonText() {
   const btn = document.getElementById('sortOrderBtn');
-  btn.innerText = currentSortOrder === 'asc' ? '升序' : '降序';
+  btn.innerText = currentSortOrder === 'asc' ? '⬆️' : '⬇️';
 }
 
 function refresh() {
