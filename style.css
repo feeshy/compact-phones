@@ -43,7 +43,7 @@ body {
   font-feature-settings: "tnum" 1, "lnum" 1;
   background: var(--bg-body-light);
   color: var(--text-light);
-  padding: 1rem;
+  padding: 1.5rem;
   line-height: 1.25;
   transition: background 0.2s;
 }
@@ -84,7 +84,7 @@ body {
 
 .header {
   border-radius: 1rem;
-  padding: 1rem 1.5rem;
+  padding: 0.8rem 1.2rem;
   margin-bottom: 1rem;
 }
 
@@ -107,7 +107,7 @@ h1 {
   text-align: right;
   font-size: 0.75rem;
   background: var(--bg-body-light);
-  padding: 0.2rem 0.7rem;
+  padding: 0.2rem 0.5rem;
   border-radius: 0.75rem;
 }
 
@@ -135,7 +135,7 @@ h1 {
 /* 筛选项网格布局 - 固定尺寸 160x64 每项 */
 .filters-grid {
   border-radius: 1rem;
-  padding: 1rem 1.5rem;
+  padding: 0.8rem 1.2rem;
   margin-bottom: 1rem;
 }
 
@@ -319,7 +319,7 @@ input[type="number"] {
   align-items: center;
   gap: 12px;
   margin-bottom: 1rem;
-  padding: 1rem 1.5rem;
+  padding: 0.8rem 1.2rem;
   border-radius: 1rem;
 }
 
