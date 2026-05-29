@@ -47,7 +47,7 @@ async function loadCSVData() {
     parseCSV(csvText);
   } catch (error) {
     console.error(error);
-    document.getElementById('tableBody').innerHTML = '<tr><td colspan="11">加载失败，请访问 <a href="https://docs.google.com/spreadsheets/d/e/2PACX-1vTxyzFWZtixYEqZMLHM_hwnSeSmFjIxIm27YWVMIMZjbfkbsfG6aPLR1fqAFuiyyW6K8znFPuAqVrOj/pubhtml?gid=134994152&single=true" target="_blank">Google Sheet</a> 查看源数据</td></tr>';
+    document.getElementById('tableBody').innerHTML = '<tr><td colspan="11">加载失败，请访问 <a href="https://docs.google.com/spreadsheets/d/e/2PACX-1vTxyzFWZtixYEqZMLHM_hwnSeSmFjIxIm27YWVMIMZjbfkbsfG6aPLR1fqAFuiyyW6K8znFPuAqVrOj/pubhtml" target="_blank">Google Sheet</a> 查看源数据</td></tr>';
     document.getElementById('statsInfo').innerText = '0/0';
   }
 }
