@@ -7,7 +7,7 @@
 ## 在线访问
 
 - [Google Sheets](https://docs.google.com/spreadsheets/d/e/2PACX-1vTxyzFWZtixYEqZMLHM_hwnSeSmFjIxIm27YWVMIMZjbfkbsfG6aPLR1fqAFuiyyW6K8znFPuAqVrOj/pubhtml)（数据源）
-- [PWA](https://feeshy.top/compact-phones)（每日同步）　[![Deploy Status](https://github.com/feeshy/compact-phones/actions/workflows/check-and-deploy.yml/badge.svg?branch=main)](https://github.com/feeshy/compact-phones/actions/workflows/check-and-deploy.yml)
+- [PWA](https://phones.feeshy.top)（每日同步）　[![Deploy Status](https://github.com/feeshy/compact-phones/actions/workflows/check-and-deploy.yml/badge.svg?branch=main)](https://github.com/feeshy/compact-phones/actions/workflows/check-and-deploy.yml)
 - [Telegram 交流群](https://t.me/compact_phones)
 
 ## 提名/纠错
