@@ -102,7 +102,10 @@ function parseCSV(csv) {
   phonesData = data;
   initYearRange();
   getMaxValue();
-  setDefaultFilters();
+  const loaded = loadStateFromLocalStorage();
+  if (!loaded) {
+    setDefaultFilters();
+  }
   refresh();
 }
 
@@ -140,6 +143,71 @@ function getMaxValue() {
     const maxW = Math.max(...foldWidths);
     const maxG = Math.max(...foldWeights);
     foldEl.innerHTML = '<br>折叠 ≤' + ceilNum(maxW) + 'mm, ' + ceilNum(maxG) + 'g';
+  }
+}
+
+function saveStateToLocalStorage() {
+  const state = {
+    widthMax: widthInput.value,
+    thickMax: thickInput.value,
+    weightMax: weightInput.value,
+    batteryMin: batteryInput.value,
+    yearFrom: document.getElementById('yearFrom')?.value || '',
+    yearTo: document.getElementById('yearTo')?.value || '',
+    currentTypeFilter,
+    currentSortField,
+    currentSortOrder
+  };
+  localStorage.setItem('phones_filter_state', JSON.stringify(state));
+}
+
+function loadStateFromLocalStorage() {
+  try {
+    const saved = localStorage.getItem('phones_filter_state');
+    if (!saved) return false;
+    const state = JSON.parse(saved);
+    if (!state) return false;
+
+    if (state.widthMax !== undefined) widthInput.value = state.widthMax;
+    if (state.thickMax !== undefined) thickInput.value = state.thickMax;
+    if (state.weightMax !== undefined) weightInput.value = state.weightMax;
+    if (state.batteryMin !== undefined) batteryInput.value = state.batteryMin;
+
+    if (state.currentTypeFilter !== undefined) {
+      currentTypeFilter = state.currentTypeFilter;
+      const btns = document.querySelectorAll('#typeSwitchGroup .type-option');
+      btns.forEach(btn => {
+        if (btn.getAttribute('data-type') === currentTypeFilter) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+      });
+    }
+
+    if (state.currentSortField !== undefined) {
+      currentSortField = state.currentSortField;
+      const sortFieldEl = document.getElementById('sortField');
+      if (sortFieldEl) sortFieldEl.value = currentSortField;
+    }
+    if (state.currentSortOrder !== undefined) {
+      currentSortOrder = state.currentSortOrder;
+      updateSortButtonText();
+    }
+
+    const yearFrom = document.getElementById('yearFrom');
+    const yearTo = document.getElementById('yearTo');
+    if (state.yearFrom !== undefined && yearFrom) {
+      yearFrom.value = state.yearFrom;
+    }
+    if (state.yearTo !== undefined && yearTo) {
+      yearTo.value = state.yearTo;
+    }
+
+    return true;
+  } catch (e) {
+    console.error('Error loading state from localStorage:', e);
+    return false;
   }
 }
 
@@ -319,6 +387,7 @@ function refresh() {
   filtered = sortData(filtered);
   renderTable(filtered);
   renderCards(filtered);
+  saveStateToLocalStorage();
 }
 
 function bindEvents() {
