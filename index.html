@@ -90,33 +90,25 @@
           <label>电池</label>
           <div class="num-input">≥<input type="number" id="batteryMin" step="50" placeholder=""><span>mAh</span></div>
         </div>
+        <div class="sort-group">
+          <!-- <span>排序</span> -->
+          <button id="sortOrderBtn">⬆️</button>
+          <select id="sortField">
+            <option value="model">机型</option>
+            <option value="brand">品牌</option>
+            <option value="screenRatio">比例</option>
+            <option value="screenSize">尺寸</option>
+            <option value="width" selected>宽度</option>
+            <option value="thickness">厚度</option>
+            <option value="weight">重量</option>
+            <option value="battery">电池</option>
+            <option value="soc">SoC</option>
+            <option value="year">年份</option>
+          </select>
+          <span id="statsInfo">/</span>
+          <button class="reset-btn" id="resetFilters">🔄</button>
+        </div>
       </div>
-    </div>
-
-    <!-- 工具栏 -->
-    <div class="action-bar">
-      <div class="sort-group">
-        <!-- <span>排序</span> -->
-        <button id="sortOrderBtn">⬆️</button>
-        <select id="sortField">
-          <option value="model">机型</option>
-          <option value="brand">品牌</option>
-          <option value="screenRatio">比例</option>
-          <option value="screenSize">尺寸</option>
-          <option value="width" selected>宽度</option>
-          <option value="thickness">厚度</option>
-          <option value="weight">重量</option>
-          <option value="battery">电池</option>
-          <option value="soc">SoC</option>
-          <option value="year">年份</option>
-        </select>
-        &nbsp;
-        <span id="statsInfo">/</span>
-        <button class="reset-btn" id="resetFilters">🔄</button>
-      </div>
-      <!-- <div class="sort-group">
-        
-      </div> -->
     </div>
 
     <!-- 表格区域 -->
