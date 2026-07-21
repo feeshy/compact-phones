@@ -91,8 +91,10 @@
           <div class="num-input">≥<input type="number" id="batteryMin" step="50" placeholder=""><span>mAh</span></div>
         </div>
         <div class="sort-group">
-          <!-- <span>排序</span> -->
-          <button id="sortOrderBtn">⬆️</button>
+          <!-- 筛选 -->
+          <button class="reset-btn" id="resetFilters">🔄</button>
+          <span id="statsInfo"></span>
+          <!-- 排序 -->
           <select id="sortField">
             <option value="model">机型</option>
             <option value="brand">品牌</option>
@@ -105,8 +107,7 @@
             <option value="soc">SoC</option>
             <option value="year">年份</option>
           </select>
-          <span id="statsInfo">/</span>
-          <button class="reset-btn" id="resetFilters">🔄</button>
+          <button id="sortOrderBtn">⬆️</button>
         </div>
       </div>
     </div>
