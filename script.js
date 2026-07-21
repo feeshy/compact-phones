@@ -152,7 +152,7 @@ function saveStateToLocalStorage() {
     weightMax: weightInput.value,
     batteryMin: batteryInput.value,
     yearFrom: document.getElementById('yearFrom')?.value || '',
-    /* yearTo: document.getElementById('yearTo')?.value || '', */
+    yearTo: document.getElementById('yearTo')?.value || '',
     currentTypeFilter,
     currentSortField,
     currentSortOrder
@@ -195,7 +195,7 @@ function loadStateFromLocalStorage() {
     }
 
     const yearFrom = document.getElementById('yearFrom');
-    /* const yearTo = document.getElementById('yearTo'); */
+    const yearTo = document.getElementById('yearTo');
     if (state.yearFrom !== undefined && yearFrom) {
       yearFrom.value = state.yearFrom;
     }
